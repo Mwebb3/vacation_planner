@@ -104,7 +104,8 @@ const init = async()=> {
       id SERIAL PRIMARY KEY,
       place_id INTEGER REFERENCES places(id) NOT NULL,
       user_id INTEGER REFERENCES users(id) NOT NULL,
-      created_at TIMESTAMP DEFAULT now()
+      created_at TIMESTAMP DEFAULT now(),
+      note VARCHAR(255)
     );
     INSERT INTO users(name) VALUES ('moe');
     INSERT INTO users(name) VALUES ('larry');
@@ -116,9 +117,10 @@ const init = async()=> {
     INSERT INTO places(name) VALUES ('COSTA RICA');
     INSERT INTO places(name) VALUES ('DALLAS');
     INSERT INTO places(name) VALUES ('MOUNT VERNON');
-    INSERT INTO vacations(user_id, place_id) VALUES (
+    INSERT INTO vacations(user_id, place_id, note) VALUES (
       (SELECT id FROM users WHERE name='lucy'),
-      (SELECT id FROM places WHERE name='ICELAND')
+      (SELECT id FROM places WHERE name='ICELAND'),
+      'Excellent trip!'
     );
   `;
   await client.query(SQL);

@@ -2,17 +2,22 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import axios from 'axios';
 
-const VacationForm = ({ places, users, bookVacation })=> {
+const VacationForm = ({ places, users, bookVacation, vacations })=> {
   const [placeId, setPlaceId] = useState('');
   const [userId, setUserId] = useState('');
+  const [note, setNote] = useState('');
+
 
   const save = (ev)=> {
     ev.preventDefault();
     const vacation = {
       user_id: userId,
-      place_id: placeId
+      place_id: placeId,
+      note: note
     };
     bookVacation(vacation);
+    setUserId('');
+    setPlaceId('');
   }
   return (
     <form onSubmit={ save }>
@@ -61,7 +66,7 @@ const Users = ({ users, vacations })=> {
   );
 };
 
-const Vacations = ({ vacations, places, cancelVacation })=> {
+const Vacations = ({ vacations, places, cancelVacation, users })=> {
   return (
     <div>
       <h2>Vacations ({ vacations.length })</h2>
@@ -69,11 +74,18 @@ const Vacations = ({ vacations, places, cancelVacation })=> {
         {
           vacations.map( vacation => {
             const place = places.find(place => place.id === vacation.place_id);
+            const user = users.find(user => user.id === vacation.user_id)
             return (
               <li key={ vacation.id }>
                 { new Date(vacation.created_at).toLocaleString() }
                 <div> 
                   to { place ? place.name : '' }
+                </div>
+                <div>
+                  by { user ? user.name : ''}
+                </div>
+                <div>
+                  Note: {vacation.note}
                 </div>
                 <button onClick={()=> cancelVacation(vacation)}>Cancel</button>
               </li>
@@ -147,12 +159,13 @@ const App = ()=> {
   return (
     <div>
       <h1>Vacation Planner</h1>
-      <VacationForm places={ places } users={ users } bookVacation={ bookVacation }/>
+      <VacationForm places={ places } users={ users } bookVacation={ bookVacation } vacations={vacations}/>
       <main>
         <Vacations
           vacations={ vacations }
           places={ places }
           cancelVacation={ cancelVacation }
+          users={users}
         />
         <Users users={ users } vacations={ vacations }/>
         <Places places={ places } vacations={ vacations }/>
