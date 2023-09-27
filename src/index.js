@@ -13,7 +13,7 @@ const VacationForm = ({ places, users, bookVacation, vacations })=> {
     const vacation = {
       user_id: userId,
       place_id: placeId,
-      note: note
+      note
     };
     bookVacation(vacation);
     setUserId('');
@@ -41,12 +41,14 @@ const VacationForm = ({ places, users, bookVacation, vacations })=> {
           })
         }
       </select>
+      <input value={note} onChange={ev => setNote(ev.target.value)}/>
       <button disabled={ !placeId || !userId }>Book Vacation</button>
     </form>
   );
 }
 
 const Users = ({ users, vacations })=> {
+
   return (
     <div>
       <h2>Users ({ users.length })</h2>
@@ -122,6 +124,17 @@ const App = ()=> {
   const [vacations, setVacations] = useState([]);
   const [places, setPlaces] = useState([]);
 
+  const dict = vacations.reduce((acc, vacation) => {
+    acc[vacation.place_id] = acc[vacation.place_id] || 0;
+    acc[vacation.place_id]++;
+    return acc;
+  }, {});
+  const max = Math.max(...Object.values(dict));
+  const entries = Object.entries(dict);
+  const popularIds = entries.filter(entry => entry[1] === max).map(entry => entry[0]*1);
+  const popular = places.filter(place => popularIds.includes(place.id));
+  
+
   useEffect(()=> {
     const fetchData = async()=> {
       const response = await axios.get('/api/vacations');
@@ -159,6 +172,15 @@ const App = ()=> {
   return (
     <div>
       <h1>Vacation Planner</h1>
+      Most Popular Trip:{ 
+        popular.map(place => {
+          return (
+            <span key={place.id}>
+              {place.name}
+            </span>
+          )
+        })
+      }
       <VacationForm places={ places } users={ users } bookVacation={ bookVacation } vacations={vacations}/>
       <main>
         <Vacations

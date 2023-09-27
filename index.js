@@ -62,9 +62,9 @@ app.get('/api/vacations', async(req, res, next)=> {
 app.post('/api/vacations', async(req, res, next)=> {
   try{
     const SQL = `
-      INSERT INTO vacations(user_id, place_id) VALUES($1, $2) RETURNING *
+      INSERT INTO vacations(user_id, place_id, note) VALUES($1, $2, $3) RETURNING *
     `;
-    const response = await client.query(SQL, [ req.body.user_id, req.body.place_id ]);
+    const response = await client.query(SQL, [ req.body.user_id, req.body.place_id, req.body.note]);
     res.send(response.rows[0]);
   }
   catch(ex){
@@ -105,7 +105,7 @@ const init = async()=> {
       place_id INTEGER REFERENCES places(id) NOT NULL,
       user_id INTEGER REFERENCES users(id) NOT NULL,
       created_at TIMESTAMP DEFAULT now(),
-      note VARCHAR(255)
+      note VARCHAR(255) NOT NULL
     );
     INSERT INTO users(name) VALUES ('moe');
     INSERT INTO users(name) VALUES ('larry');
